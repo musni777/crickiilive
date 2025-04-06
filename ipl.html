@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Webcric Pro - Advanced Live Streaming</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Ads Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3414489208702389"
+     crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@300;400;600&display=swap');
+      
+        :root {
+            --primary: #00ff9d;
+            --secondary: #00b8ff;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --danger: #ff3d3d;
+            --warning: #ffcc00;
+            --text-light: #e0e0e0;
+            --bg-light: #f5f5f5;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark);
+            color: white;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 255, 157, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 184, 255, 0.05) 0%, transparent 50%);
+            min-height: 100vh;
+            transition: background 0.3s ease;
+        }
+        
+        body.light-mode {
+            background-color: var(--bg-light);
+            color: #333;
+            --primary: #007acc;
+            --secondary: #ff5722;
+            --dark: #e0e0e0;
+            --darker: #cccccc;
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--darker), var(--dark));
+            text-align: center;
+            padding: 20px;
+            font-size: 28px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+        }
+        
+        .content {
+            text-align: center;
+            margin-top: 30px;
+            padding: 0 20px;
+        }
+        
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+        }
+        
+        .stream-container {
+            position: relative;
+            width: 85%;
+            margin: 0 auto;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+            transition: all 0.3s ease;
+            border: 1px solid var(--primary);
+        }
+        
+        iframe:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 157, 0.5);
+        }
+        
+        .stream-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stream-btn {
+            background: rgba(0, 184, 255, 0.2);
+            border: 1px solid var(--secondary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+        }
+        
+        .stream-btn:hover {
+            background: rgba(0, 184, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .stream-btn.active {
+            background: var(--secondary);
+            color: black;
+        }
+        
+        .connection-speed {
+            margin-top: 10px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            font-size: 14px;
+        }
+        
+        .match-time {
+            background: rgba(10, 10, 10, 0.8);
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            margin: 30px auto;
+            border-radius: 8px;
+            width: 80%;
+            border: 1px solid var(--secondary);
+            box-shadow: 0 0 15px rgba(0, 184, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .match-time::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 65%, rgba(0, 184, 255, 0.1) 100%);
+            pointer-events: none;
+        }
+        
+        .match-time strong {
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .current-time {
+            background: rgba(5, 5, 5, 0.9);
+            color: var(--secondary);
+            padding: 12px;
+            font-size: 16px;
+            margin: 20px auto;
+            border-radius: 8px;
+            width: 200px;
+            border: 1px solid var(--secondary);
+            box-shadow: 0 0 10px rgba(0, 184, 255, 0.2);
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+        }
+        
+        .today-matches {
+            background: rgba(5, 5, 5, 0.9);
+            border: 1px solid var(--warning);
+            border-radius: 8px;
+            width: 80%;
+            margin: 30px auto;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
+        }
+        
+        .today-matches h3 {
+            color: var(--warning);
+            font-family: 'Orbitron', sans-serif;
+            margin-top: 0;
+            text-align: center;
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+        
+        .match-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .match-item {
+            background: rgba(10, 10, 10, 0.7);
+            border: 1px solid rgba(0, 184, 255, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .match-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 184, 255, 0.2);
+            border-color: var(--secondary);
+        }
+        
+        .match-teams {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+            margin-bottom: 5px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .match-time-text {
+            color: var(--secondary);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .match-venue {
+            color: #aaa;
+            font-size: 13px;
+            font-style: italic;
+        }
+        
+        .match-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .status-live {
+            background-color: rgba(255, 61, 61, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        
+        .status-upcoming {
+            background-color: rgba(0, 184, 255, 0.2);
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+        }
+        
+        .status-completed {
+            background-color: rgba(0, 255, 157, 0.2);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .recommendations {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px auto;
+            flex-wrap: wrap;
+            max-width: 1200px;
+        }
+        
+        .recommendation {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.8), rgba(5, 5, 5, 0.9));
+            width: 220px;
+            height: 320px;
+            border-radius: 12px;
+            text-align: center;
+            padding: 15px;
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .recommendation:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 25px rgba(0, 255, 157, 0.3);
+            border-color: var(--primary);
+        }
+        
+        .recommendation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                transparent 45%,
+                rgba(0, 255, 157, 0.1) 50%,
+                transparent 55%
+            );
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+        
+        .recommendation img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 184, 255, 0.3);
+            margin-bottom: 15px;
+        }
+        
+        .recommendation p {
+            color: var(--primary);
+            font-size: 16px;
+            margin-top: 10px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+        
+        .mention {
+            background: rgba(5, 5, 5, 0.9);
+            padding: 15px;
+            margin: 30px auto;
+            font-size: 16px;
+            color: var(--secondary);
+            border-radius: 8px;
+            width: 80%;
+            text-align: center;
+            border: 1px solid rgba(0, 184, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 184, 255, 0.1);
+        }
+        
+        .mention a {
+            color: var(--primary);
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .mention a:hover {
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+        }
+        
+        footer {
+            background: linear-gradient(to right, var(--darker), var(--dark));
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid var(--secondary);
+            box-shadow: 0 0 15px rgba(0, 184, 255, 0.2);
+        }
+        
+        /* System UI Elements */
+        .system-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(5, 5, 5, 0.95);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 15px;
+            width: 300px;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+            transform: translateX(120%);
+            transition: transform 0.5s ease;
+            z-index: 1000;
+        }
+        
+        .system-notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-title {
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 10px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-title::before {
+            content: '⚡';
+            margin-right: 10px;
+        }
+        
+        .notification-content {
+            color: white;
+            font-size: 14px;
+        }
+        
+        .status-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.9);
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--secondary);
+            z-index: 100;
+        }
+        
+        .status-item {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-item::before {
+            content: '▶';
+            margin-right: 5px;
+            color: var(--primary);
+            font-size: 8px;
+        }
+        
+        .hud-element {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: rgba(5, 5, 5, 0.7);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 15px;
+            width: 120px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
+        }
+        
+        .hud-title {
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .hud-value {
+            color: white;
+            font-size: 24px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Live Chat */
+        .live-chat {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            width: 300px;
+            background: rgba(5, 5, 5, 0.9);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);
+            z-index: 99;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .live-chat.show {
+            transform: translateY(0);
+        }
+        
+        .chat-header {
+            background: rgba(0, 184, 255, 0.2);
+            padding: 10px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            cursor: pointer;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--secondary);
+            background: rgba(10, 10, 10, 0.8);
+            color: white;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+        
+        .chat-input button {
+            background: var(--secondary);
+            border: none;
+            color: black;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* Dark/Light Mode Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 184, 255, 0.2);
+            border: 1px solid var(--secondary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        /* Animated elements */
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes glitch {
+            0% { text-shadow: 0 0 5px var(--primary); }
+            25% { text-shadow: -2px 0 5px var(--danger); }
+            50% { text-shadow: 2px 0 5px var(--secondary); }
+            75% { text-shadow: -2px -2px 5px var(--warning); }
+            100% { text-shadow: 2px 2px 5px var(--primary); }
+        }
+        
+        .glitch-text {
+            animation: glitch 3s infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            iframe {
+                width: 95%;
+                height: 300px;
+            }
+            
+            .recommendations, .match-list {
+                flex-direction: column;
+                align-items: center;
+                grid-template-columns: 1fr;
+            }
+            
+            .hud-element, .live-chat {
+                display: none;
+            }
+            
+            .system-notification {
+                width: 80%;
+                right: 10%;
+            }
+            
+            .today-matches {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- System Notification -->
+    <div class="system-notification" id="notification">
+        <div class="notification-title">STREAM ACTIVATED</div>
+        <div class="notification-content">Webcric live feed successfully connected. Enjoy the match, Hunter.</div>
+    </div>
+    
+    <!-- HUD Element -->
+    <div class="hud-element">
+        <div class="hud-title">VIEWERS</div>
+        <div class="hud-value pulse" id="viewer-count">100,827</div>
+    </div>
+    
+    <!-- Live Chat -->
+    <div class="live-chat" id="liveChat">
+        <div class="chat-header" onclick="toggleChat()">
+            <i class="fas fa-comments"></i> LIVE CHAT
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <div class="header glitch-text">
+        Musni⚡CRIC PRO STREAMING
+    </div>
+
+    <div class="content">
+        <h2> IPL LIVE STREAM </h2>
+        <div class="stream-container">
+            <iframe src="https://me.webcric.com/willow.htm" title="Webcric Live Stream" id="streamFrame"></iframe> 
+            </div>
+            <div class="stream-controls">
+                <button class="stream-btn active" onclick="changeQuality('auto')">AUTO</button>
+                <button class="stream-btn" onclick="changeQuality('hd')">HD</button>
+                <button class="stream-btn" onclick="changeQuality('sd')">SD</button>
+                <button class="stream-btn" onclick="changeQuality('low')">LOW</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="match-time">
+        <p>NoW Match Going IPL </p>
+        <p>NEXT MATCH: <strong>KKR vs MI</strong></p>
+        <p id="countdown" class="pulse"></p>
+    </div>
+
+    <div class="match-time">
+        <p>NEXT MATCH: <strong>KKR vs MI</strong></p>
+        <p>SCHEDULED: 7:30 PM GMT (12:00 AM IST / GMT+5:30)</p>
+        <p id="countdown" class="pulse"></p>
+    </div>
+
+    <div class="current-time">
+        SYSTEM TIME: <span id="current-time"></span>
+    </div>
+    
+    <!-- Today's Matches Section -->
+    <div class="today-matches">
+        <h3><i class="fas fa-calendar-day"></i> TODAY'S MATCH SCHEDULE</h3>
+        <div class="match-list">
+            <div class="match-item">
+                <div class="match-teams">CSK vs RR</div>
+                <div class="match-time-text">7:30 PM GMT (12:00 AM IST)</div>
+                <div class="match-venue">Wankhede Stadium, Mumbai</div>
+                <div class="match-status status-upcoming">UPCOMING</div>
+            </div>
+            <div class="match-item">
+                <div class="match-teams">MI vs KKR</div>
+                <div class="match-time-text">3:30 PM GMT (8:00 PM IST)</div>
+                <div class="match-venue">Eden Gardens, Kolkata</div>
+                <div class="match-status status-completed">COMPLETED</div>
+            </div>
+            <div class="match-item">
+                <div class="match-teams">RCB vs DC</div>
+                <div class="match-time-text">11:30 AM GMT (4:00 PM IST)</div>
+                <div class="match-venue">M. Chinnaswamy Stadium, Bengaluru</div>
+                <div class="match-status status-completed">COMPLETED</div>
+            </div>
+            <div class="match-item">
+                <div class="match-teams">SRH vs PBKS</div>
+                <div class="match-time-text">Live Now</div>
+                <div class="match-venue">Rajiv Gandhi Stadium, Hyderabad</div>
+                <div class="match-status status-live">LIVE</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="recommendations">
+        <div class="recommendation">
+            <img src="https://via.placeholder.com/220x200/0a0a0a/00ff9d?text=CSK+vs+MI" alt="Match 1">
+            <p>MATCH 01: CSK vs MI</p>
+        </div>
+        <div class="recommendation">
+            <img src=="https://admin.cricadium.com/wp-content/uploads/2025/03/MI-vs-KKR-Match-Prediction-IPL-2025-Match-12.avif">
+            <p>MATCH 02: MI vs KKR</p>
+        </div>
+        <div class="recommendation">
+            <img src="https://via.placeholder.com/220x200/0a0a0a/ff3d3d?text=DC+vs+RCB" alt="Match 3">
+            <p>MATCH 03: DC vs RCB</p>
+        </div>
+    </div>
+
+    <div class="mention">
+        No One Alive Now This Time
+    </div>
+
+    <footer>
+        <p>© 2025 WEBCRIC PRO | ALL RIGHTS RESERVED</p>
+    </footer>
+    
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-item">CONNECTION: <span id="network-status">STABLE</span></div>
+        <div class="status-item">BANDWIDTH: <span id="bandwidth">8.2 MB/S</span></div>
+        <div class="status-item">LATENCY: <span id="latency">128ms</span></div>
+        <div class="status-item" id="status-time">SYSTEM TIME: 00:00:00</div>
+    </div>
+
+    <script>
+        // Show notification after page load
+        setTimeout(function() {
+            document.getElementById('notification').classList.add('show');
+            
+            // Hide after 5 seconds
+            setTimeout(function() {
+                document.getElementById('notification').classList.remove('show');
+            }, 5000);
+        }, 1000);
+        
+        // Set the date for the next match (7:30 PM GMT, March 30, 2025)
+        var matchDate = new Date("March 30, 2025 19:30:00 GMT+0000");
+
+        // Function to update the countdown and current time
+        function updateCountdown() {
+            var now = new Date();
+            var timeLeft = matchDate - now;
+
+            // Display current time
+            var timeString = now.toLocaleTimeString('en-US', {hour12: false});
+            document.getElementById("current-time").textContent = timeString;
+            document.getElementById("status-time").textContent = "SYSTEM TIME: " + timeString;
+
+            // Random viewer count fluctuation
+            var viewerBase = 9827;
+            var viewerFluctuation = Math.floor(Math.random() * 100) - 50;
+            document.getElementById("viewer-count").textContent = (viewerBase + viewerFluctuation).toLocaleString();
+            
+            // Countdown logic
+            if (timeLeft <= 0) {
+                document.getElementById("countdown").innerHTML = "MATCH IN PROGRESS";
+                clearInterval(countdownInterval);
+                return;
+            }
+
+            var hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
+            var minutes = Math.floor((timeLeft / 1000 / 60) % 60);
+            var seconds = Math.floor((timeLeft / 1000) % 60);
+
+            document.getElementById("countdown").innerHTML = 
+                "COUNTDOWN: " + 
+                hours.toString().padStart(2, '0') + ":" + 
+                minutes.toString().padStart(2, '0') + ":" + 
+                seconds.toString().padStart(2, '0');
+        }
+
+        // Update the countdown every second
+        var countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown(); // Initial call
+        
+        // Random system notifications
+        var notifications = [
+            "Network bandwidth optimized for HD streaming.",
+            "Anti-buffer protocols activated.",
+            "Viewer experience at 98% efficiency.",
+            "Stream encryption: Level 3 secured.",
+            "CDN nodes synchronized across 12 regions.",
+            "Today's match schedule updated with live status.",
+            "Dont'Woory We Creake the Match.",
+            "Live match updates delivered at the speed of a power shot.",
+            "No pauses, just power—streaming with the force of a six.",
+            "Streaming so smooth, even your grandma's cricket commentary can't keep up!",
+            "Stream like you've got no job the next day!",
+            
+            "Fuck Fuck Fuck Fuck.",
+            ".",
+            "4 matches scheduled for today. 1 live now."
+        ];
+        
+        setInterval(function() {
+            if (Math.random() > 0.7) { // 30% chance to show notification
+                var randomNote = notifications[Math.floor(Math.random() * notifications.length)];
+                document.getElementById('notification').querySelector('.notification-content').textContent = randomNote;
+                document.getElementById('notification').classList.add('show');
+                
+                setTimeout(function() {
+                    document.getElementById('notification').classList.remove('show');
+                }, 3000);
+            }
+        }, 15000);
+        
+        // Update match statuses based on current time
+        function updateMatchStatuses() {
+            const now = new Date();
+            const matches = [
+                {
+                    element: document.querySelectorAll('.match-item')[0],
+                    time: new Date("March 30, 2025 19:30:00 GMT+0000"),
+                    status: 'upcoming'
+                },
+                {
+                    element: document.querySelectorAll('.match-item')[1],
+                    time: new Date("March 30, 2025 15:30:00 GMT+0000"),
+                    endTime: new Date("March 30, 2025 18:30:00 GMT+0000"),
+                    status: 'completed'
+                },
+                {
+                    element: document.querySelectorAll('.match-item')[2],
+                    time: new Date("March 30, 2025 11:30:00 GMT+0000"),
+                    endTime: new Date("March 30, 2025 14:30:00 GMT+0000"),
+                    status: 'completed'
+                },
+                {
+                    element: document.querySelectorAll('.match-item')[3],
+                    time: new Date("March 30, 2025 10:30:00 GMT+0000"),
+                    endTime: new Date("March 30, 2025 13:30:00 GMT+0000"),
+                    status: 'live'
+                }
+            ];
+            
+            matches.forEach(match => {
+                const statusElement = match.element.querySelector('.match-status');
+                const timeElement = match.element.querySelector('.match-time-text');
+                
+                if (match.status === 'live') {
+                    if (now >= match.time && now <= match.endTime) {
+                        statusElement.textContent = 'LIVE';
+                        statusElement.className = 'match-status status-live';
+                        timeElement.textContent = 'Live Now';
+                    } else if (now > match.endTime) {
+                        statusElement.textContent = 'COMPLETED';
+                        statusElement.className = 'match-status status-completed';
+                    }
+                } else if (match.status === 'upcoming' && now >= match.time) {
+                    statusElement.textContent = 'LIVE';
+                    statusElement.className = 'match-status status-live';
+                    timeElement.textContent = 'Live Now';
+                }
+            });
+        }
+        
+        updateMatchStatuses();
+        setInterval(updateMatchStatuses, 60000); // Update every minute
+        
+        // Simulate connection speed test
+        function testConnectionSpeed() {
+            // Simulate network test
+            const speeds = ['POOR', 'FAIR', 'GOOD', 'EXCELLENT'];
+            const latencyValues = [280, 180, 120, 80];
+            const bandwidthValues = ['2.1 MB/S', '4.5 MB/S', '8.2 MB/S', '12.7 MB/S'];
+            
+            let speedIndex = Math.floor(Math.random() * 3) + 1; // Avoid "POOR"
+            
+            // Randomly make connection unstable (10% chance)
+            if (Math.random() < 0.1) {
+                speedIndex = 0;
+            }
+            
+            document.getElementById('network-status').textContent = speeds[speedIndex];
+            document.getElementById('latency').textContent = latencyValues[speedIndex] + 'ms';
+            document.getElementById('bandwidth').textContent = bandwidthValues[speedIndex];
+            
+            const speedText = `CONNECTION: ${speeds[speedIndex]} | ${bandwidthValues[speedIndex]} | ${latencyValues[speedIndex]}ms`;
+            document.getElementById('connectionSpeed').innerHTML = `<i class="fas fa-tachometer-alt"></i> ${speedText}`;
+            
+            // Change color based on speed
+            const connectionElement = document.getElementById('connectionSpeed');
+            connectionElement.style.color = 
+                speedIndex === 0 ? 'var(--danger)' : 
+                speedIndex === 1 ? 'var(--warning)' : 'var(--primary)';
+        }
+        
+        // Test connection every 30 seconds
+        testConnectionSpeed();
+        setInterval(testConnectionSpeed, 30000);
+        
+        // Stream quality selector
+        function changeQuality(quality) {
+            const buttons = document.querySelectorAll('.stream-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Simulate quality change (in a real app, this would switch streams)
+            let message = `Stream quality set to ${quality.toUpperCase()}`;
+            if (quality === 'hd') message += " (1080p)";
+            if (quality === 'sd') message += " (720p)";
+            if (quality === 'low') message += " (480p)";
+            
+            showNotification("QUALITY ADJUSTED", message);
+        }
+        
+        // Live Chat Functions
+        function toggleChat() {
+            document.getElementById('liveChat').classList.toggle('show');
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (message) {
+                addMessage("You", message);
+                input.value = '';
+                
+                // Simulate bot response
+                setTimeout(() => {
+                    const responses = [
+                        "Great point!",
+                        "I agree!",
+                        "What a match!",
+                        "Don't Chat  Whatch Live Fool",
+                        "🏏🔥",
+                        "This bowler is on fire today!"
+                       
+                    
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addMessage("Mohideen pichii", randomResponse);
+                }, 1000);
+            }
+        }
+        
+        function addMessage(user, text) {
+            const chatBox = document.getElementById('chatMessages');
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<strong>${user}:</strong> ${text}`;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        
+        // Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.querySelector('.theme-toggle i');
+            if (document.body.classList.contains('light-mode')) {
+                icon.className = 'fas fa-sun';
+            } else {
+                icon.className = 'fas fa-moon';
+            }
+        }
+        
+        // Helper function to show notifications
+        function showNotification(title, content) {
+            const notification = document.getElementById('notification');
+            notification.querySelector('.notification-title').textContent = title;
+            notification.querySelector('.notification-content').textContent = content;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Simulate initial chat messages
+        setTimeout(() => {
+            addMessage("Musni", "Welcome to Musni Pro Live Chat!");
+            addMessage("Mohideen Pichi", "Excited for today's matches!");
+        }, 2000);
+    </script>
+</body>
+</html>
